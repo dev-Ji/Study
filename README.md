@@ -1,17 +1,5 @@
 # TIL
 
-First Day In Myplanet D+1
-
-## 📣MyPlanet 가이드
-
-- 화장실은 나가서 좌측에 있습니다(남여공용이며 이용시 문잠그고 이용하면 됩니다.)
-- 원하는 책이 있으면 문성현CTO님께 말씀하시면 됩니다.
-- 안쪽으로 들어가시면 냉장고와 커피,간식,비품 등이 있습니다.
-- 문을 기준으로 앞쪽으로 첫번째 방은 회의실로 이용을 하며, 두번째 방은 멤버들이 쉴 수 있는 공간입니다.
-- 사무실 청소는 매주 금요일에 합니다.
-- 출근시간은 자유로우나 점심시간은 12시 30분 입니다.
-- 호칭은 "~님" 또는 "~씨"를 이용합니다.
-- 매주 금요일 회의 →이번주엔 어떤 내용을 진행 하였는지 어떤 내용때문에 시간이 딜레이 되었는지 다음주에는 어떤걸 진행 할것인지.. 목요일쯔음 생각해두면 좋습니다.
 
 ## 📣notion  이용방법
 
@@ -275,3 +263,409 @@ $ sudo nano /var/www/html/index.html
     이제 브라우저에서 사이트를 로드 할 수 있습니다.
 
     이제 4개의 단계를 반복하여 더 많은 도메인을 추가 할 수 있습니다.
+
+# 리눅스 기본 명령어
+
+- 모든 명령어는 명령어 뒤에 "—help" 옵션을 주면 자세한 사용 방법이 나온다.
+
+    ex) Is 명령의 자세한 사용 방법과 모든 옵션을 알고 싶으면 Is-help 를 입력하면 된다.
+
+### pwd(print working directory)
+
+현재 작업중인 디렉토리 정보 출력
+
+```jsx
+$ pwd
+/home/root
+```
+
+### cd ( change directory)
+
+경로 이동
+
+절대 경로와 상대 경로로 이동 가능
+
+```jsx
+$ cd /home/root/jiyeun
+$ pwd
+/home/root/jiyeun
+
+$ cd ..           (상위폴더로)
+$ pwd
+/home/root
+```
+
+### ls ( list )
+
+디렉토리 목록 확인
+
+```jsx
+$ ls
+testfile1 testfile2 testfile3
+```
+
+### cp (copy)
+
+파일 혹은 디렉토리를 복사
+
+디렉토리를 복사할때는 -r 옵션을 주어야함
+
+cp 명령어 뒤에 복사하고자 하는 파일이나 디렉토리적고 복사하는 파일이나 디렉토리 네임
+
+```jsx
+$ ls
+testdir/ testfile
+
+$ cp testfile1 testfile_cp
+$ ls
+testdir/ testfile testfile_cp
+
+$ cp -r testdir testdir_cp
+$ls
+testdir/ testdir_cp/ testfile testfile_cp
+```
+
+### mv (move)
+
+파일 혹은 디렉토리 이동
+
+실제로 원하는 위치로 이동할때도 사용하지만, 이름을 변경하는 용도로도 사용한다.
+
+같은 폴더에서 파일, 디렉토리 이동을 하는 경우 이름변경 효과가 있다.
+
+앞에 파일이 오고 뒤에 디렉토리가 오는경우에는 파일을 디렉토리로 이동한다.
+
+여러개의 파일도 이동이 가능하다 ex) mv 파일명 파일명 디렉토리/
+
+cp 와는 달리 디렉토리를 이동할때도 별다른 옵션이 필요없다.
+
+```jsx
+$ ls
+testdir/ testfile
+
+$ mv testfile testfile_mv  (이름변경)
+$ls
+testdir/ testfile_mv
+
+$ mv testfile_mv testdir/    (앞에 파일이 오고 뒤에 디렉토리가 오는경우)
+$ ls
+testdir/
+
+$ ls testdir/
+testfile
+
+$ mv dir1/ dir2/    (dir1 디렉토리를 dir2 디렉토리로 이름을 변경)
+```
+
+### mkdir ( make directory)
+
+디렉토리 생성
+
+-p 옵션을 주면 하위 디렉토리까지 한 번에 생성 가능
+
+아래 예제중 ls -R 옵션은 디렉토리의 하위목록까지 전부 보여주는 옵션
+
+```jsx
+$ mkdir dir1    (현재 디렉토리에 dir1 디렉토리를 만듬)
+$ mkdir dir1 dir2   (한번에 여러개의 디렉토리 생성)
+$ mkdir -p dir1/dir2  (디렉토리를 만들 때 상위(부모) 디렉토리가 없으면 만든다.
+$ mkdir -m 700 dir5    (디렉토리를 만들 때 권한 까지 지정)
+```
+
+### rm (remove)
+
+파일이나 디렉토리를 삭제
+
+디렉토리를 삭제할때는 r 옵션을 주어야 한다.
+
+-f 옵션을 주면 사용자에게 삭제 여부를 묻지 않고 바로 삭제한다.
+
+디렉토리를 삭제할 때는 하위 디렉토리까지 모두 삭제되므로 **유의**
+
+rmdir 은 디렉토리를 삭제할때 사용하나 일반적으로 rm -r 을 이용해서 삭제한다.
+
+```jsx
+$ ls
+testdir/ testfile1 testfile2
+
+$ rm -f testfile1
+$ ls
+testdir/ testfile2
+
+$ rm -rf testdir/
+$ ls
+testfile2
+
+$ rm -r home/     (비어있지 않은 디렉토리는 -r 옵션 없이는 삭제 불가능)
+```
+
+### touch
+
+파일이나 디렉토리의 최근 업데이트 일자를 현재 시간으로 변경한다.
+
+최근 업데이트 일자는 ls -l 명령을 통해 확인 할 수 있다.
+
+아래 예제에서 '11월 6 22:08' 이라고 쓰여진 부분이다.
+
+파일이나 디렉토리가 존재하지 않으면 빈 파일을 만든다.
+
+-t 라는 옵션을 사용하면 서버의 현재시간이 아닌 지정된 시간으로 파일의 날짜시간 정보를 변경한다.
+
+```jsx
+$ ls -l
+total 0
+-rw-r--r-- 1 jiyeun 197121 0 11월 6 22:08 testfile1
+
+$ touch testfile1
+$ ls -l
+total 0
+-rw-r--r-- 1 jiyeun 197121 0 11월  6 22:43 testfile1
+-rw-r--r-- 1 jiyeun 197121 0 11월  6 22:44 testfile2
+
+$ touch newfile   (빈 파일 생성)
+$ touch -c newfile (현재시간으로 파일 날짜정보 변경)
+$ touch -t 202011141200 newfile (파일의 날짜정보를 마음대로 변경(YYYYMMDDhhmm 형식)
+$ touch -r oldfile newfile (지정한 파일 날짜시간정보를 지정한 다른 파일의 날짜시간정보와 
+														동일하게 변경(newfile을 oldfile의 날짜정보와 같게 변경))
+```
+
+### cat ( concatenate)
+
+cat 명령은 활용방법이 다양하다.
+
+단순히 파일의 내용을 출력 할 수도 있고, 파일 여러개를 합쳐서 하나의 파일로 만들 수도 있다.
+
+그리고 기존 한 파일의 내용을 다른 파일에 덧붙일 수도 있다.
+
+새로운 파일을 만들때에도 사용된다.
+
+file1, file2, file3 파일에는 각각 간단하게 숫자 1, 2, 3 이 적혀있다.
+
+리다이렉션 기호(>)를 사용하여 입력한 내용으로 새로운 파일 만듬
+
+```jsx
+$ ls
+file1 file2 file3
+
+$ cat file1  ( cat 명령 뒤에 파일 이름을 입력하면 그 파일의 내용 출력)
+1
+$ cat file2
+2
+$ cat file3
+3
+
+$ cat file1 file2 file3  (여러 개의 파일을 전달하여 파일내용을 연속해서 출력)
+1
+2
+3
+
+$ cat -n file1 file2 file3  ( cat 명령의 n옵션을 사용하면 행 번호를 표시)
+
+$ cat file1 file2 > file1_2  (file1과 file2 내용을 가진 file1_2라는 파일생성)
+$ ls
+file1 file1_2 file2 file3
+
+$ cat file1_2
+1
+2
+
+$ cat >> file1 (내용 입력후 ctrl+d 로 저장)
+								( > 기호를 사용하면 기존에 있는 파일 내용을 지우고 저장,
+									>> 기호를 사용하면 기존 파일 내용 뒤에 연속해서 기록저장)
+
+$ cat file1 >> file2  ( file2 에 file1 내용을 연속해서 기록저장)
+$ cat file2
+2
+1
+
+$ cat > file4 (내용을 입력하고 ctrl+d 로 저장, 입력한 내용으로 새로운파일 생성)
+hello
+world
+(작성이 끝나면 ctrl +d 로 파일 저장)
+
+$ cat file4
+hello
+world
+```
+
+### head
+
+파일의 앞부분을 보고싶은 줄 수 만큼 보여준다.
+
+옵션을 지저어하지 않으면 파일 상위 10줄을 보여준다.
+
+```jsx
+$ cat testfile
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+
+$ head -3 testfile (-3 으로 범위를 지정했기 때문에 3줄만 나옴)
+1
+2
+3
+
+$ head testfile  (범위를 지정안해서 상위 10줄만 보여줌)
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+```
+
+### tail
+
+파일의 뒷부분을 보고싶은 줄 수 만큼 보여준다.
+
+옵션을 지정하지 않으면 파일 하위 10줄을 보여준다.
+
+참고로 -F 옵션을 주고 실행하면, 
+
+파일내용을 화면에 계속 띄워주고 파일이 변하게되면 새로운 업데이트 된 내용을 갱신해준다.
+
+주로 실시간으로 내용이 추가되는 로그파일을 모니터링할때 유용하게 사용한다.
+
+```jsx
+$ cat testfile
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+
+$ tail -3 testfile (하위 범위를 정해줌)
+13
+14
+15
+
+$ tail testfile
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+
+$ tail -F testfile
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+(명령어가 종료되지 않고 계속 해당 화면을 출력하며, 파일 내용 변경시 자동으로 갱신)
+```
+
+### find
+
+특정 파일이나 디렉토리를 검색한다.
+
+사용법이 앞의 명령어들에 비해 살짝 복잡. 기본 사용법을 언급하자면 다음과 같다.
+
+find[검색경로] -name [파일명]
+
+파일명은 직접 풀 네임을 입력해도 되지만, 다음 예제처럼 특정 조건을 적용해 검색 할 수도 있다.
+
+```jsx
+$ ls
+dir1/ dir3/ file1 file3 picture1.jpg picture3.jpg
+dir2/  dir4/  file2  file4  picture2.jpg  picture4.jpg
+
+$ find ./ -name 'file1'
+./file1
+
+$ find ./ -name "*.jpg" (.jpg 인 파일을 찾는것)
+./picture1.jpg
+./picture2.jpg
+./picture3.jpg
+./picture4.jpg
+```
+
+확장자가 .jpg 인 파일을 찾았다.
+
+하지만 여기서 그치지 않고, 확장자가 .jpg인 파일만 찾아서 바로 삭제 할 수도 있다.
+
+exec 옵션을 사용해 다음과 같이 처리한다.
+
+```jsx
+$ find ./ -name "*.jpg" -exec rm {} \;
+$ ls
+dir1/  dir2/  dir3/  dir4/  file1  file2  file3  file4
+```
+
+-type 옵션을 주면, 디렉토리나 파일만 지정해서 검색 할 수도 있다.
+
+```jsx
+$ find ./ -type d
+./
+./dir1
+./dir2
+./dir3
+./dir4
+
+$ find ./ -type f
+./file1
+./file2
+./file3
+./file4
+```
+
+wc -l 옵션과 같이 사용하면,
+
+특정 디렉토리에 find 조건에 맞는 결과 값이 몇 개 존재하는지 숫자로 간편히 알아볼 수 있다.
+
+```jsx
+$ find ./ -type f | wc -l
+4
+```
+
+아래 내용은 명령어가 조금 복잡하지만,
+
+특정 조건에 해당하는 파일들의 내용을 전부 찾아서 바꾸는 것이다.
+
+예를 들어, 10만개의 파일이 있는데, 그 중에 확장자가 .txt 인 파일만 찾아내고,
+
+txt 파일 안에 있는 'hi' 라는 문자열을 'hello'로 바꾸려면 다음과 같이 하면 된다.
+
+```jsx
+$ find ./ -name "*.txt" -exec sed -i 's/hi/hello/g' {} \;
+(sed 명령어는 testfile1.txt 이라는 파일의 모든 hi 라는 문자열을 hello로 바꾸는 역할)
+
+$ sed -i 's/hi/hello/g' testfile1.txt
+(이를 find 명령과 조합하여 조건에 맞는 모든 파일에 대해 해당 명령을 수행할 수 있도록 응용한것)
+```
