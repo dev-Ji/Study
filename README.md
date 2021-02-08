@@ -672,3 +672,249 @@ $ find ./ -name "*.txt" -exec sed -i 's/hi/hello/g' {} \;
 $ sed -i 's/hi/hello/g' testfile1.txt
 (이를 find 명령과 조합하여 조건에 맞는 모든 파일에 대해 해당 명령을 수행할 수 있도록 응용한것)
 ```
+
+
+
+## 2021.02.08
+## 📣Ubuntu 20.04 에 Uginx 설치 및 최적화
+
+```jsx
+sudo apt update && apt upgrade -y
+```
+
+      시작전 기본패키지 업데이트 및 최신화합니다.
+
+```jsx
+sudo apt install curl gnupg2 ca-certificates lsb-release
+```
+
+      nginx 패키지 설치이전 선행작업
+
+```jsx
+sudo apt update
+sudo apt install nginx
+```
+
+      레포지토리의 최신 버전이 설치 됩니다.
+
+```jsx
+sudo service nginx start
+service nginx status
+nginx -v
+```
+
+      설치가 완료 되면 버전을 확인해줍니다.
+
+```jsx
+sudo netstat -lntp
+```
+
+      nginx 구동테스를 위해 80번 포트가 리스닝 되고있으면 실행이 된 상태입니다.
+
+웹으로 접근하려면 브라우저에서 ip를 넣어주면 됩니다.
+
+```jsx
+sudo systemctl enable nginx.service
+```
+
+      재부팅시 자동시작을 위해 서비스를 등록합니다.
+
+nginx 의 설정 파일은 /etc/nginx/nginx.conf 입니다.
+
+기본적으로 nginx의 Process 구조는 아래와 같습니다.
+
+apache 는 스레드, 프로세스 기반의 아키텍처인 반면에 
+
+nginx의 경우 이벤트 중심에 아키텍처가 있습니다.
+
+nginx는 다수의 작업자 프로세스를 실행할 수 있으며, 각각은 다수의 동시 연결을 처리 할 수 있습니다.
+
+worker_processes – Nginx 작업자 프로세스 수 (기본값은 1).대부분의 경우 CPU 코어 당 하나의 작업자 프로세스를 실행하면 효과가 있으며, 이를 달성하기 위해이 지정 문을 설정하는 것이 좋습니다 .작업자 프로세스가 많은 디스크 I / O를 수행해야하는 경우,이 수를 늘리려는 경우가 있습니다.
+
+worker_connections – 각 작업자 프로세스가 동시에 처리 할 수있는 최대 연결 수.기본값은 512이지만 대부분의 시스템에는 더 많은 수를 지원하기에충분한 리소스가 있습니다.적절한 설정은 서버 크기와 트래픽 특성에 따라 다르며테스트를 통해 검색 할 수 있습니다.
+
+```jsx
+sudo vi /etc/nginx/nginx.conf
+```
+
+      로 들어가 아래 부분과 같이 변경해주세요
+
+```jsx
+worker_processes 4;
+events {
+worker_connections 1024;
+}
+```
+
+      설정 후 sudo service nginx restart 로 재시작을 해줍니다.
+
+## 📣PHP-FPM 설치 및 설정
+
+      nginx 에서 php파일을 읽을 수 있도록 php-fpm 을 설치해보도록 하겠습니다.
+
+php-fpm 설치는 매우 단순하나 nginx설정을 비롯해서 최적화 과정이 복잡하기 때문에 잘 따라와야한다.
+
+```jsx
+sudo apt install -y php7.4-fpm php7.4-gd php7.4-json php7.4-mysql
+php7.4-curl php7.4-mbstring php7.4-intl php-imagick php7.4-xml php7.4-zip
+```
+
+      입력하여 설치를 합니다.
+
+```jsx
+php -v
+```
+
+      설치가 완료 되었으면 php -v 명령어를 입력하면 설치확인이 가능합니다.
+
+```jsx
+sudo vi /etc/php/7.4/fpm/pool.d/www.conf
+```
+
+      의 내용중에 listen= 을 찾아서 수정하면 됩니다.
+
+listen = /run/php/php7.4-fpm.sock
+
+바로 밑에 줄에
+
+listen = 127.0.0.1:9000을 입력해주면 됩니다.
+
+```jsx
+sudo systemctl restart php7.4-fpm.service
+netstat -lntp
+```
+
+      재시작 후에 수신확인하기
+
+```jsx
+sudo vi /etx/php/7.4/fpm/pool.d/www.conf
+```
+
+       들어가서 /pm = dynamic 으로 찾고 아래와 같이 수정해줍니다.
+
+```jsx
+pm.max_children = 120
+pm.start_servers = 12
+pm.min_spare_servers = 6
+pm.max_spare_servers = 18
+```
+
+```jsx
+sudo systemctl restart php7.4-fpm.service
+ps -ef | grep php
+```
+
+      설정 완료후에 재시작 시켜주고 확인하면 변경된걸 확인 할 수 있습니다.
+
+```jsx
+sudo vi /etc/php/7.4/fpm/php.ini
+```
+
+      php 최적화(메모리 및 업로드 크기)를 위해서 파일로 들어간 후에
+
+```jsx
+memory_limit = 1024M
+post_max_size = 128M
+upload_max_filesize = 128M
+```
+
+      수정해주면 됩니다. (메모리,용량은 용도에 맞춰서 설정하시면 됩니다.)
+
+변경 후에 다시 sudo systemctl restart php7.4-fpm.service 명령어로 다시 시작하고 
+
+확인해주면 됩니다.
+
+```jsx
+sudo vi /etc/nginx/sites-available/default
+```
+
+      nginx는 설정파일을 변경해야 합니다.
+
+`upstream php-handler {server 127.0.0.1:9000;}`
+
+`server {client_max_body_size 128M;listen 80 default_server;listen [::]:80 default_server;`
+
+`root /var/www/html;`
+
+`index index.php index.html index.htm index.nginx-debian.html;`
+
+`server_name _;`
+
+`access_log /var/log/nginx/web.access.log;error_log /var/log/nginx/web.error.log;`
+
+`location / {`
+
+`try_files $uri $uri/ /index.php?$args;}`
+
+`error_page 404 /404.html;`
+
+`error_page 500 502 503 504 /50x.html;`
+
+`location = /50x.html {root /usr/share/nginx/html;}`
+
+`location ~ \.php$ {fastcgi_pass php-handler;fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;include fastcgi_params; fastcgi_read_timeout 300;}`
+
+`location ~ /\.ht {deny all;}}`
+
+## 📣 워드프레스 설치
+
+```jsx
+wget https://wordpress.org/latest.tar.gz
+```
+
+ wget 명령어를 이용하여 워드프레스를 다운받습니다.
+
+```jsx
+gzip -d latest.tar.gz && tar xvf latest.tar
+```
+
+압축파일로 다운받아지기 때문에 압축을 해제해 줍니다.
+
+압축을 풀면 wordpress 란 디렉터리에 파일이 모두 압축해제 되어있는것을 알수있습니다.
+
+```jsx
+rm -rf /var/www/html/*
+cp -r /root/wordpress/* /var/www/html/
+```
+
+이것을 웹 투트 디렉터리로 이동시켜줍니다.
+
+## 📣웹 접속 후 설정하기
+
+웹으로 ip에 접속해보면 잘 나올것이다. 여기서 let's go 버튼을 누르면 db정보를 입력하는데
+
+제출하면 이번에는 wp-config 에 해당 내용을 복사 붙여넣기 하라고 한다.
+
+vi /var/www/html/wp-config.php 하여 새로 만들어서 복사 붙여넣기 하면 된다.
+
+그리고 Run the installation 하면 사이트 설정을 하고 마무리한다.
+
+---
+
+---
+
+## 📣Ubuntu 에서 notion 설치
+
+([https://tolovefeels.tistory.com/63](https://tolovefeels.tistory.com/63) 을 참고)
+
+```
+wget https://notion.davidbailey.codes/notion-linux.list
+sudo mv notion-linux.list /etc/apt/sources.list.d/notion-linux.list
+sudo apt update && sudo apt install notion-desktop
+```
+
+```jsx
+npm -g install asar electron-packager electron-installer-debian
+```
+
+1. nvm 을 이용하여 node 를 설치해줍니다
+
+    `nvm install node`
+
+2. npm 버전 7 을 설치합니다.
+
+    `npm install -g npm@7`
+
+3. 앱 빌드에 필요한 다른 패키지를 설치합니다.(apt사용)
+
+    `sudo apt install p7zip-full imagemagick make g++ fakeroot rpm`
