@@ -918,3 +918,181 @@ npm -g install asar electron-packager electron-installer-debian
 3. 앱 빌드에 필요한 다른 패키지를 설치합니다.(apt사용)
 
     `sudo apt install p7zip-full imagemagick make g++ fakeroot rpm`
+    
+
+# 2021.02.09
+## 📣 가상 머신(VM) 이란?
+
+컴퓨터 안에 또 다른 컴퓨터를 동작 시키는 것이다. 컴퓨터 시스템을 에뮬레이션 한다고 말한다.
+
+이를 종종 게스트라고 하며, 이를 실행하는 실제 시스템을 호스트라고 한다.
+
+실제로 물리적으로 존재는 컴퓨터는 아니지만 실제 컴퓨터처럼 작동한다.
+
+컴퓨터의 주된 부붐들(CPU, RAM, 하드디스크 등)의 기능을 소프트웨어적으로 구현해 가상으로 만들어서    
+
+구현한다.
+
+가상 머신은 크게 시스템 가상 머신과 프로세스 가상 머신 두 가지로 나뉜다.
+
+시스템 가상 머신은 실제 기계를 대체해서 제공하며, 전체 운영체제를 실행하기 위한 기능들을 제공한다.
+
+프로세스 가상 머신은 플랫폼에 독립적인 환경에서 컴퓨터 프로그램을 실행하기 위해 고안되었다. 프로그
+
+래밍언어의 하드웨어 추상화를 위해 사용된다.
+
+가상화를 이용하면 하나의 물리적 시스템에서 각각 자체 운영 체제(OS)와 애플리케이션을 지닌 다수의
+
+가상머신을 작성 할 수 있다. VM은 실제 컴퓨터와 직접 상호 작용 할 수 없다.
+
+대신에 여기서 VM과 기본적인 실제 하드웨어 간의 조정을 위해 하이퍼바이저라고 하는 경량 소프트웨어
+
+계층이 필요하다. 하이퍼바이저는 실제 컴퓨팅 리소스(예: 프로세서,메모리 및 스토리지)를 각 VM에
+
+할당한다. 이는 서로 간에 간섭하지 않도록 VM을 각각 분리한다.
+
+이 기술은 가상 서버, 가상 서버 인스턴스(VSI)및 가상 프라이빗 서버(VPS)등을 포함하여 많은 이름으로
+
+불리기도 한다.
+
+## 📣하이퍼바이저란?
+
+하이퍼바이저는 호스트 컴퓨터에서 다수의 운영체제를 동시에 실행하기 위한 논리적 플랫폼을 말한다. 가상화 머신 모니터 또는 가상화 머신 매니저라고도 부른다.
+
+하이퍼바이저는 일반적으로 2가지로 나뉜다.
+
+- 타입 1
+
+운영 체제가 프로그램을 제어하듯이 하이퍼바이저가 해당 하드웨어에서 직접 실행되며 게스트 운영 체제는 하드웨어 위에서 2번째 수준으로 실행된다.
+
+- 타입2
+
+하이퍼바이저는 일반 프로그램과 같이 호스트 운영 체제에서 실행되며 VM 내부에서 동작되는 게스트 운영 체제는 하드웨어에서 3번째 수준으로 실행된다.
+
+## 📣AWS 에서 워드프레스
+
+- 1단계 : Amazon Machine Image 선택
+
+(사진1)EC2 인스턴스를 생성하려면 AWS 콘솔에서 Amazon EC2로 이동한다. [인스턴스 시작] 이라고 적힌 파란색 버튼을 클릭하여 인스턴스 생성 마법사를 연다.
+
+(사진1)
+
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/8795014f-2b14-4a49-ae3c-1f27a03b9891/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/8795014f-2b14-4a49-ae3c-1f27a03b9891/Untitled.png)
+
+(사진2)첫 페이지에서 Amazon Machine Image("AMI")를 선택한다. 선택하는 AMI에 따라 새 EC2 인스턴스에 설치되는 기본 소프트웨어가 결정된다. 여기에는 운영체제(예: Amazon Linux, Red Hat Enterprise Linux, Ubuntu, Microsoft Server 등)는 물론이고, 머신에 설치되는 애플리케이션도 포함된다.
+
+많은 AMI는 다양한 애플리케이션을 실행하기 위한 범용 AMI이지만 딥 러닝 AMI나 다양한 AWS Marketplace AMI를 비롯한 일부 AMI는 특정 사용 사례에 맞게 특별히 구축된 AMI 이다.
+
+Amazon Linux  배포판을 선택하는 것이 일반적이므로 AMI 선택 뷰에서 Amazon Linux 2 AMI(HVM)를 선택한다.
+
+(사진2)
+
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/375beb73-c86f-452f-995a-086b6a08a1eb/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/375beb73-c86f-452f-995a-086b6a08a1eb/Untitled.png)
+
+- 2단계 : 인스턴스 유형 선택
+
+(사진3) EC2 마법사의 두 번째 화면에서는 EC2 인스턴스 유형을 선택한다. 인스턴스 유형은 CPU, 메모리(RAM), 스토리지 및 네트워크 용량이 포함된 특정한 구성이다.
+
+AWS에는 여러 가지 워크로드를 포괄하는 수많은 인스턴스 유형이 있다. 어떤 인스턴스는 데이터베이스나 캐시처럼 메모리를 많이 사용하는 워크로드에 적절하고, 어떤 인스턴스는 이미지 처리나 비디오 인코딩처럼 컴퓨팅을 많이 사용하는 워크로드에 적절하다.
+
+(사진3)
+
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/5a3de5db-3fad-4438-bef2-e0028df1f87a/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/5a3de5db-3fad-4438-bef2-e0028df1f87a/Untitled.png)
+
+- 3단계 : 보안 그룹 구성
+
+(사진4) [검토 및 시작] 버튼을 클릭하면 [인스턴스 시작 검토] 화면이 표시된다. 인스턴스를 시작하기 전에 한가지를 더 구성해야 한다. 보안 그룹은 EC2 인스턴스에 허용되는 네트워크 트래픽 종류를 설명하는 네트워킹 규칙이다. 인스턴스에 다음 두 가지 종류의 트래픽을 허용 할 수 있다.
+
+(사진4)
+
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/1a406af4-3c07-411b-8f24-163742bc9d8b/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/1a406af4-3c07-411b-8f24-163742bc9d8b/Untitled.png)
+
+(사진5)
+
+🗨️ SSH : SSH 프로토콜을 사용하여 EC2 인스턴스에 로그인하고 WordPress를 구성 할 수 있도록 현재 IP 주소에서 들어오는 SSH 트래픽을 허용한다.
+
+🗨️ HTTP : 사용자가 WordPress 사이트를 볼 수 있도록 모든 IP 주소에서 들어오는 HTTP 트래픽을 허용한다. 이를 구성하려면 검토 페이지에서 [보안 그룹 편집] 링크를 클릭한다.
+
+보안 그룹의 현재 규칙이 표시된다.
+
+SSH 규칙이 구성되어 있지만 모든 IP 주소에서의 SSH 액세스가 허용된다.
+
+HTTP 트래픽을 허용하려면 [규칙 추가] 을 클릭하여 새 규칙에서 [유형] 열의 드롭다운을 클릭해서
+
+HTTP를 선택하면 HTTP 규칙에 대한 기본값이 자동으로 채워진다.
+
+(사진5)
+
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/236ea56e-8b7b-48a3-b514-ccb2d9288710/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/236ea56e-8b7b-48a3-b514-ccb2d9288710/Untitled.png)
+
+- 4단계 : 시작 및 SSH 키 받기
+
+(사진6)이제 EC2 인스턴스를 시작해야 한다. 파란색 [시작]버튼을 클린하여 EC2 인스턴스를 생성한다.
+
+(사진6)
+
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/80bbef1d-7808-467d-b91b-e09f7c24ef4a/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/80bbef1d-7808-467d-b91b-e09f7c24ef4a/Untitled.png)
+
+(사진7,사진8)인스턴스의 키 페어를 구성하는 방법이 자세히 표시된다. 키 페어를 사용하여 인스턴스에 SSH를 통해 액세스하면 서버에서 명령을 실행 할 수 있게 된다.
+
+인스턴스의 새 키 페어를 생성하고 이름을 지정한다. 그런 다음 [키 페어 다운로드] 버튼을 클릭하여 머신에 .pem 파일을 다운로드한다. 이 파일은 다음 모듈에서 사용한다.
+
+(사진7)
+
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/a798c547-c7ae-4bfe-94ce-55a27b12fb50/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/a798c547-c7ae-4bfe-94ce-55a27b12fb50/Untitled.png)
+
+(사진8)
+
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/ea4a883b-41ec-436b-bce7-5ef12ab3b0a0/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/ea4a883b-41ec-436b-bce7-5ef12ab3b0a0/Untitled.png)
+
+## 📣 EC2 에서 WordPress 구성
+
+- 1단계 : Uginx 웹 서버 설치
+
+Wordpress를 실행하려면 EC2 인스턴스에서 웹 서버를 실행해야 한다.
+
+EC2 인스턴스에 Nginx를 설치하려면 터미널에 명령을 실행한다.
+
+```jsx
+ssh -i ~/다운로드/test01.pem ubuntu@52.79.241.25
+sudo apt update && apt upgrade -y
+sudo apt install curl gnupg2 ca-certificates lsb-release
+sudo apt update
+sudo apt install nginx
+sudo service nginx start
+service nginx status
+nginx -v
+```
+
+(2021.02.05, 2021.02.08 페이지 참조)
+
+- 2단계 : mysql 설치
+- 3단계 : php 설치
+- 4단계 : wordpress 설치
+
+## 📣 Ubuntu 에서 Mysql 또는 MariaDB 완전 삭제하기
+
+mysql
+
+```jsx
+sudo apt-get purge mysql-server
+sudo apt-get purge mysql-common
+```
+
+mariaDB
+
+```jsx
+sudo apt-get purge mariadb-server
+sudo apt-get purge mariadb-common
+```
+
+공통
+
+```jsx
+sudo rm -rf /var/log/mysql
+sudo rm -rf /var/log/mysql.*
+sudo rm -rf /var/lib/mysql
+sudo rm -rf /etc/mysql
+```
+
+# 2021.02.10
