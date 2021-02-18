@@ -1147,3 +1147,56 @@ CPU 나 메모리는 프로세스가 필요한 만큼만 추가로 사용하고 
 - 이미지는 컨테이너를 실행하기 위한 모든 정보를 가지고 있기 때문에 더이상 의존성파일을 컴파일하고 설치할 필요가 없음. ex) 새로운 서버가 추가되면 미리 만들어 놓은 이미지를 다운받고 컨테이너를 생성하면 됨.
 - 한 서버에 여러개의 컨테이너 실행이 가능, 수십,수백,수천대의 서버도 문제없음.
 - 도커 이미지의 용량은 거대하고 메가에서 시작해서 기가단위로 넘어가는 경우도 있음.이런 큰 용량의 이미지를 Docker hub를 통해 공개 이미지를 무료로 관리 할 수 있음.
+
+
+## 📣 Node 지우기
+
+docker 를 설치한 후 node 버전이 원하던 버전과 맞지 않아서 제거
+
+(특정 node.js 버전 삭제하기 $ nvm uninstall vx.x.x 이 방법으로 지우려고 했으나.... 지워지지 않아 
+
+```
+sudo apt-get purge nodejs
+sudo apt-get autoremove
+```
+
+이 명령어로 지우려고 했으나...또 실패...구글링으로 여러 시도를 해보았지만 지워지지 않았다....후...내시간......ㅂㅂ... 하지만!! 방법을 찾음!!!!!!)
+
+```jsx
+sudo rm -rf ~/.npm ~/.nvm ~/node_modules ~/.node-gyp ~/.npmrc ~/.node_repl_history
+
+sudo rm -rf /usr/local/bin/npm /usr/local/bin/node-debug /usr/local/bin/node /usr/local/bin/node-gyp
+
+sudo rm -rf /usr/local/share/man/man1/node* /usr/local/share/man/man1/npm*
+
+sudo rm -rf /usr/local/include/node /usr/local/include/node_modules
+
+sudo rm -rf /usr/local/lib/node /usr/local/lib/node_modules /usr/local/lib/dtrace/node.d
+
+sudo rm -rf /opt/local/include/node /opt/local/bin/node /opt/local/lib/node
+
+sudo rm -rf /usr/local/share/doc/node
+
+sudo rm -rf /usr/local/share/systemtap/tapset/node.stp
+```
+
+제거 후에 다시 node 를 원하는 버전으로 설치
+
+13.x 로 설치할 예정이며 다른버전을 설치하고싶으시면 앞에 숫자만 변경하시면 됩니다.
+
+```jsx
+# Using Ubuntu
+curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+```
+
+아래 명령어를 이용하면 위에 등록한 레포지터리에서 node.js를 설치하게 됩니다.
+
+```jsx
+sudo apt-get install -y nodejs
+```
+
+설치후에 버전은 node -v 명령어로 확인이 가능(node -v 명령어로 확인하려 했으나 오류가 떠서 구글링을 하던 중 해결이 되지 않아 terminal 을 껐다 켰더니 바로 확인됨.......하..내시간) 
+
+```jsx
+node -v
+```
