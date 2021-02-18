@@ -1200,3 +1200,574 @@ sudo apt-get install -y nodejs
 ```jsx
 node -v
 ```
+
+
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/fff7480e-6396-48f8-9c2c-800aae9d2404/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/fff7480e-6396-48f8-9c2c-800aae9d2404/Untitled.png)
+
+### 도커와 가상머신의 차이점
+
+도커를 이용한 시스템은 호스트OS에서 그대로 작업이 처리되는데 반해 가상머신을 이용한 경우는 중간에 있는 게스트OS에 의해 또 다시 제어되는걸 볼 수 있다. 하드웨어를 가상화하고 운영체제를 가상화하는곳 자체가 없기 때문에 메모리 접근속도, 파일시스템 사용속도, 네트워크 속도 등에서 가상머신에 비해 월등하게 빠른 속도를 가진다.
+
+### 도커의 특징
+
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/72a3ce75-854d-48e3-9232-99509dc68d2a/Untitled.jpeg](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/72a3ce75-854d-48e3-9232-99509dc68d2a/Untitled.jpeg)
+
+도커는 게스트 OS를 설치하지 않는다.
+- 이미지에 서버 운영을 위한 실행 파일과 라이브러리만 격리해서 설치한다.
+- OS설치가 없기 때문에 이미지 용량이 크게 줄어든다.
+- HOST와 OS자원을 공유한다.
+
+도커에는 하드웨어 가상화 계층이 없다.
+- 메모리 접근, 네트워크 전송 속도가 기존의 가상 머신보다 압도적으로 빠르다.
+- Host PC와 도커 컨테이너는 성능 차이가 거의 없다. 도커는 이미지 생성과 배포에 특화되어있다.
+- Git과 같은 소스 형상관리처럼 이미지 버전 관리도 제공하고, 중앙 저장소에 이미지를 올리고 받을 수 있다.
+- GitHub와 비슷하게 도커 이미지를 공유하는 Docker Hub를 제공한다.
+- 다양한 API를 제공해서 사용자가 필요한 만큼 자동화가 가능하기 때문에 개발을 할때나 서버 운영을 할 때 매우 유용하다.
+
+
+## 📣Node 설치 후 VSCODE
+
+node js 는 chrome V8 javascript 엔진으로 빌드된 javascript 런타임입니다.
+
+vscode에 빈프로젝트를 만들고 터미널을 열어줍니다.
+
+express 를 이용할 것이기 때문에 express 사이트로 이동하여 시작하기 탭을 눌러서 들어가 줍니다.
+
+```jsx
+npm init
+```
+
+명령어를 이용하여 변경하지 않고 그냥 default 값으로 두겠습니다.
+
+```jsx
+npm install express --save
+```
+
+명령어를 이용하여 express(node.js를 위한 웹프레임워크의 하나)를 설치 하게 되면 관련된 node 모듈이 설치되고
+
+package.json 파일에 셋팅이 됩니다. 이상태에서 new file 을 해서 app.js 라는 이름으로 파일을 만들어줍니다. 
+
+그리고 app.js 에 express 를 연결해주고 원하는 port 번호를 지정한뒤
+
+express().get("/", (req,res) ⇒ res.send("OK"))) get 방식으로 req들어왔을때 OK라는 문자를 res 할 수 있도록 합니다.
+
+app.js 라는 파일을 돌리기 위해서 package.json 파일에서 "scripts" :{ "start" : "node app.js" } 로 변경한뒤 터미널에서 npm start 를 하면 서버가 running 되는 것을 확인 할 수 있습니다.
+
+url 에 [localhost](http://localhost)을 연결해보면 OK가 나옵니다! 이러면 아주 간단하게 웹서버를 킨것입니다.
+
+🤚🏻잠깐! 여기서 연결이 안된다면!
+
+```jsx
+sudo netstat -nap|grep 80
+```
+
+으로 지금 80번 포트가 이용중인지 확인을 해봅니다
+
+Listen으로 80포트가 사용중이라면 
+
+```jsx
+sudo kill $(sudo lsof -t -i:80)
+```
+
+이 명령어로 비활성화 시킨뒤에 다시 sudo npm start 를 하면 됩니다!
+
+## 📣docker 를 이용하여 image 만들기
+
+도커는 이미지 기반이기 때문에 컨테이너가 있고 이미지가 들어갑니다.
+
+그래서 지금 만든 OK 웹어플리케이션을 image를 만들어야합니다. 그러기 위해선 image를 만드는것이 dockerfile이 됩니다. vscode 에서 new file로 dockerfile 이라는 이름으로 파일을 만들어줍니다.
+
+그 파일 안에 docker 명령어 들이 들어가야 합니다.
+
+```jsx
+FROM node:current-slim
+# 이 이미지를 무슨 기반으로 만들것이냐 (부모가 되는 이미지) : 버전은 무엇을 쓰겠냐
+# slim 버전은 노드를 실행하기 위해서 최소한의 패키지만을 포함한 버전
+
+WORKDIR /app
+#이 프로젝트가 들어갈 워크디렉터리
+
+COPY package.json .
+# 이 도커 파일에 위치한 것에 package.json 파일을 copy 하겠다 도커 컨테이너 안에 있는 노드 기반의 컨테이너에 이 앱 디렉토리 안에서 package.json을 복사하겠다
+
+RUN npm install
+# 패키지파일 json을 가지고 npm install 을 하면 express 가 설치
+
+EXPOSE 80
+# 80 포트를 열겠다
+
+CMD [ "npm", "start" ]
+#package.json를 보면 npm start 로 서버를 구동시킴
+
+COPY . .
+#남아있는 소스 코드를 복사하겠다
+```
+
+dockerfile에 넣어줍니다. 
+
+그리고 터미널에 docker image ls 를 치면 지금은 아무것도 나오지 않을것입니다.(image가 없다는것)
+
+터미널에
+
+```jsx
+sudo docker build -t --ok-node-test:0.0.1 .
+(이미지태그이름 , 버전, 경로 )
+```
+
+이제 node 를 먼저 다운을 받습니다. 이것은 dockerhub 라는 곳에서 다운을 받는것입니다.
+
+```jsx
+sudo docker image ls
+```
+
+로 다시한번 image 를 확인하면 이미지가 생긴것을 확인 할 수 있습니다. 그런데 여기서 두개인 이유는
+
+부모가 되는 node current slim라는 버전을 받아서 이미지가 있는것이고 , 이 이미지를 기반으로 한 ok-node-test 가 생성된것입니다.
+
+## 📣 AWS 인스턴스 생성 및 접속
+
+aws 에서 인스턴스 생성을 해주고 터미널에서 접속해줍니다.
+
+참고) 2021.02.09
+
+aws 에 도커를 설치해줍니다.
+
+```jsx
+sudo apt update && sudo apt -y upgrade
+sudo apt install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io
+```
+
+이렇게 최신 도커 엔진을 설치해주었습니다.
+
+aws 인스턴스에서도 마찬가지로 도커 엔진이 설치 됐는지 확인을 위해
+
+```jsx
+sudo docker run hello-world
+```
+
+로 확인하겠습니다.
+
+```jsx
+Unable to find image 'hello-world:latest' locally
+
+latest: Pulling from library/hello-world
+
+0e03bdcc26d7: Pull complete
+
+Digest: sha256:49a1c8800c94df04e9658809b006fd8a686cab8028d33cfba2cc049724254202
+
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+
+This message shows that your installation appears to be working correctly.
+
+To generate this message, Docker took the following steps:
+
+ 1. The Docker client contacted the Docker daemon.
+
+ 2. The Docker daemon pulled the "hello-world" image from the Docker Hub.
+
+    (amd64)
+
+ 3. The Docker daemon created a new container from that image which runs the
+
+    executable that produces the output you are currently reading.
+
+ 4. The Docker daemon streamed that output to the Docker client, which sent it
+
+    to your terminal.
+
+To try something more ambitious, you can run an Ubuntu container with:
+
+ $ docker run -it ubuntu bash
+
+Share images, automate workflows, and more with a free Docker ID:
+
+ https://hub.docker.com/
+
+For more examples and ideas, visit:
+
+ https://docs.docker.com/get-started/
+```
+
+이런 내용이 나오면 성공입니다.
+
+## 📣dockerhub 에 image 등록하기
+
+dockerhub 에 접속하여 가입을 해서 이메일에서 확인까지 해줍니다.
+
+그리고 myprofile 에 들어가면 repositories 가 비어있는것을 확인할수있습니다.
+
+이제 터미널에서 docker 에 로그인을 해주겠습니다.
+
+```jsx
+sudo docker login
+```
+
+명령어를 사용하면 username과 password 를 입력합니다.
+
+login succeeded 라는 구문이 뜨면 로그인 성공입니다.
+
+도커 이미지를 올리기 전에 태그를 달아줍니다.
+
+```jsx
+sudo docker tag ok-node-test:0.0.1 wendyyi/ok-node-test:0.0.1
+sudo docker image ls
+```
+
+명령어를 사용하여 이미지를 확인해보면 본인 username/ok-node-test 라는 repository 가 생긴것을 확인 할 수 있습니다. 이제 도커허브에 올릴 준비가 되었습니다.
+
+```jsx
+sudo docker push wendyyi/ok-node-test:0.0.1
+```
+
+이렇게 본인의 repository 로 push를 해줍니다
+
+dockerhub 에 접속해서 myprofile 에 본인의 repository 를 확인하면 push 된것을 확인할수있습니다.
+
+## 📣 AWS 환경에서 docker 이미지를 반영하기
+
+터미널에서 ssh 를 이용하여 aws 개발 환경으로 접속한뒤 본인 repository 에 있는 것을 다운을 받아서 돌리기 위해서 docker login 을 진행합니다
+
+```jsx
+sudo docker login
+sudo docker run -d -p 80:80 wendyyi/ok-node-test:0.0.1
+```
+
+이렇게 로그인을 해서 pull을 할수 있습니다.
+
+```jsx
+sudo docker ps
+```
+
+pull 받은것을 확인 할 수 있습니다.
+
+이제 url 에 aws 환경 ip 를 확인하면 OK 가 나온것을 확인할수 있습니다!!
+
+# 🥳
+
+
+## 📣리액트란 무엇일까?
+
+react 는 현재 협업에서 인기 잇는 웹/앱의 view를 개발할 수 있도록 하는 라이브러리이다.
+
+보통 우리가 생각하는 어플리케이션(웹, 앱 혹은 데스크톱용 소프트웨어)을 만들기 위해서는 사용자가 조작하기 위한 UI, UI를 컨트롤 하기 위한 로직, 데이터를 처리하는 비즈니스 로직 등 3가지 부분으로 개발이 필요하다. 
+
+이렇게 특정 부분을 나누어 개발하는 방법론을 MVC 패턴, MVVM패턴 이라고 하며, react.js 는 View 즉, 사용자가 조작하기 위한 UI를 만드는 것을 도와주는 라이브러리 이다.
+
+ "컴포넌트" 라는 개념에 집중 되어있는 라이브러리이다. 컴포넌트를 간단하게 설명하자면, 데이터를 넣으면 우리가 지정한 유저 인터페이스를 조립해서 보여준다. 페이스북 개발자들이 라이브러리의 성능과 개발자 경험을 개선하기 위해 많은 연구를 한다. 생태계가 넓고, 사용하는 곳도 많다. HTTP 클라이언트, 라우터 , 심화적 상태 관리 등의 기능들은 내장되어 있지 않다. 따로 공식 라이브러리가 있는것도 아니여서 개발자가 원하는 스택을 맘대로 골라서 사용 할 수있다.
+
+## 📣리액트의 특징
+
+react.js 를 처음 배우면 react.js 의 특징으로 다음과 같은 말을 볼 수 있다.
+
+1. react는 선언형이다.
+2. react는 컴포넌트 기반으로 재사용성이 뛰어나다.
+3. react는 virual DOM(가상돔)기반으로 가볍다.
+4. react 컴포넌트는 state 와 props을 가진다.
+
+여기에서 다음의 키워드를 얻을 수 있다. 선언형, 컴포넌트, 재사용성, 가상돔.
+
+1. 선언형 Declarative 란
+
+```jsx
+소프트웨어 공학에서 자주 접하게 되는 개념은 패러다임이다. 즉, 프로그래밍을 어떻게 할 것인가
+하는 생각에 대한 논의가 활발하게 이루어진다.
+ 이 중 리액트를 하면 자주 접할 수 있는 패러다임이 선언형 프로그래밍과 명령형 Imperative 
+프로그래밍이다.
+리액트는 선언형 성격에 맞게 컴포넌트(원하는 결과,뷰)를 얻기위해 <tag></tag>jsx문법을 통해
+구현한다. 즉, jsx를 얻기 위한 알고리즘에 대한 구현을 하지 않는다.(예를들어,
+document.createElement 나 혹은 해당 컴포넌트의 변경사항을 체크하는 알고리즘, 리-렌더링 여부에
+대한 알고리즘을 구현하지 않는다.)
+ 이와 같은 선언형 특성은, 리액트를 사용할 때 화면 설계라는 초점에 맞춰서 개발할 수 있도록 해주므로,
+다른 부분에 대한 고민을 최소화해주어 높은 생산성을 보장할 수 있도록 해준다.
+```
+
+2. 컴포넌트 및 재사용성
+
+```jsx
+리액트를 쓰는 지금 컴포넌트(Component)라는 개념을 통해 작성한 HTML,CSS를 간략하게
+<Component/> 와 같은 식으로 쓸 수 있다.
+ 컴포넌트는 구현, 명세화, 패키지화, 그리고 배포될 수 있어야 한다.
+ 컴포넌트는 독립적인 단위의 소프트웨어 모듈을 말한다. 즉 소프트웨어를 독립적인 하나의 부품으로
+만드는 방법이다. 리액트는 웹에서 쓰는 각 요소들을 컴포넌트로 만들 수 있게 해 기존의 UI를 다른
+화면에서 다시 쓸 수 있도록 하는 장점(높은 재사용성)을 가진다
+```
+
+3. Virtual DOM(가상돔)
+
+```jsx
+가상돔을 이해하기 위해선 In-memory의 개념에 대해 알아두면 좋다. 웹브라우저와 자바스크립트를
+동작시키기 위한 V8엔진도 소프트웨어이다. 즉, 이들이 실행되면 메모리(RAM)이 할당이 된다.
+ 가상돔은 이 메모리 단에서 컴포넌트에 대한 정보를 생성하고 비교하여 전체 DOM트리가
+업데이트가 필요한 경우 이를 반영하는 방식을 말한다.
+ 만약, 실제 DOM 트리에서 변화가 바로바로 반영된다면 하나의 동작(입력값변화, 데이터 변화)마다
+전체 DOM트리가 변경되어 브라우저 렌더링 과정(HTML 파싱, 렌더 ㅌ트리 배치, 렌더 트리 그리기
+등의 과정)이 매번 일어나서 웹 브라우저의 동작에 많은 리소스가 들어가게 된다.
+```
+
+4. State 와 Props
+
+```jsx
+리액트는 내부적으로 State와 Props를 가진다. 이는, UI가 사용자의 동작에 따라 다른 UI나
+Action이 필요하기 때문이다.
+ 리액트를 잘 다루기 위해서는 이런 State 에 대한 이해가 필요하다. 어떤 컴포넌트를 만들 때,
+내부 컴포넌트에 어떤 State가 있을지, 페이지 전체에 어떤 State가 있는지 파악하고 개발을
+진행하는 것이 좋다.
+ 리액트로 UI 개발을 한다면 State와 Props를 어떻게 구성할 것인지를 먼저 파악하고
+개발하도록 하는것이 좋다.
+```
+
+## 📣SPA 란?
+
+SPA 란 Single Page Application의 약자이다.
+
+단일 페이지 어플리케이션(SPA)는 현재 웹개발의 트랜드이다.
+
+기존 웹 서비스는 요청시마다 서버로부터 리소스들과 데이터를 해석하고 화면에 렌더링하는 방식이다. SPA 형태는 브라우저에 최초에 한번 페이지 전체를 로드하고, 이후부터는 특정 부분만 Ajax를 통해 데이터를 바인딩 하는 방식이다.
+
+            전통적인 페이지 vs 단일 페이지 어플리케이션 비교
+
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6f55d2d4-8002-405c-b093-969cf7cca167/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6f55d2d4-8002-405c-b093-969cf7cca167/Untitled.png)
+
+## 📣SPA 장점과 단점
+
+- 장점
+    1. 손쉬운 운영 배포
+
+        ⇒ 전통적인 웹 개발 방식과 달리 Client Side와 Server Side 에서 하는 역할에 대해 분리가 가능하며 배포가 기존 웹개발보다 쉽다
+
+    2. 사용자 친화적
+
+        ⇒사용자 측면에서 일정한 전체 페이지 새로 고침 혹은 웹사이트에서 정보를 얻기 위해 앞뒤      로 왔다갔다 하는 것은 과도한 네트워크 트래픽을 유도하고 편이성 마저 떨어진다.
+
+    3. 서버 요청이 적음(REST API를 통한 데이터 송수신)
+
+        ⇒ 필요한 부분의 데이터만 요청하기 때문에 서버 요청이 적다.
+
+        초기 페이지로드 후에 SPA에서 네트워크를 통해 더이상 HTML이 전송되지 않는다.
+
+        SPA가 실행되는 동안 데이터만 유선을 통해 전송이 되므로 HTML을 지속적으로 보내는 것보다 시간과 대역폭이 훨씬 적다.
+
+- 단점
+    1. 검색 엔진 최적화에는 어려움이 있습니다.
+
+        ⇒ SPA는 서버 렌더링 방식이 아닌 js 기반의 비동기 모델이다.
+
+        View를 생성하는데 js 가 필요하다. 하지만 대부분의 웹 크롤러 봇들은 js파일을 실행시키지 못한다. 따라서 클라이언트 렌더링 방식 페이지를 빈 페이지로인식하게 되어, 웹 크롤러들은 내용을 알 수 없고 제대로 된 데이터를 수집 할 수 없다.
+
+        (웹크롤러는 스파이더 또는 검색 엔진 봇이라고도 하고, 전체 인터넷에서 콘텐츠를 다운로드하고 색인을 생성한다. 이러한 봇의 목표는 웹 상의 모든 웹페이가 무엇에 대한 것인지 파악하여 필요할 때 정보를 추출할 수 있도록 하는것이다. 웹 크롤러라고 부르는 것은 소프트웨어 프로그램을 통해 자동으로 웹사이트에 엑세스하여 데이터를 얻는 일을 기술 용어로 크롤링이라고 하기 때문)
+
+    2. 초기 구동에 시간이 걸림
+
+        ⇒ 웹 애플리케이션에 필요한 모든 정적 리소스를 최초에 한번 다운로드하기 때문에
+
+## 📣 React 주요 개념
+
+가장 단순하 React 예시는 다음과 같이 생겼습니다.
+
+```jsx
+ReactDOM.render(
+	<h1>Hello, world!</h1>
+	document.getElementById('root')
+);
+```
+
+아래 변수 선언을 살펴봅시다.
+
+```jsx
+const element = <h1>Hello, world!</h1>
+```
+
+위에 태그 문법은 문자열도, HTML도 아닙니다.
+
+JSX라고 하며 JavaScript를 확장한 문법입니다. JSX는 React "엘리먼트(element)"를 생성합니다.
+
+### 🗨️JSX란?
+
+React에서는 이벤트가 처리되는 방식, 시간에 따라 state 가 변하는 방식, 화면에 표기하기 위해 데이터가 준비되는 방식 등 렌더링 로직이 본질적으로 다른 UI 로직과 연결된다는 사실을 받아드립니다.
+
+React는 별도의 파일에 마크업과 로직을 넣어 기술을 인위적으로 분리하는 대신, 둘 다 포함하는 "컴포넌트"라고 부르는 느슨하게 연결된 유닛으로 관심사를 분리합니다. 이후 섹션에서 다시 컴포넌트로 돌아오겠지만, JS에 마크업을 넣는 게 익숙해지지 않는다면 이 이야기가 확신을 줄 것입니다.
+
+React는 JSX 사용이 필수가 아니지만, 대부분의 사람은 js코드 안에서 UI관련 작업을 할 때 시각적으로 더 도움이 된다고 생각합니다. 또한 React가 더욱 도움이 되는 에러 및 경고 메시지를 표시할 수 있게 해줍니다.
+
+## 📣 React 설치하기
+
+```jsx
+npm install -g create-react-app
+create-react-app my-app
+```
+
+- 새 프로젝트의 src/ 폴더에 있는 모든 파일들을 삭제해주세요.(폴더 안의 내용만 삭제하되 폴더는 삭제하면 안됨)
+
+```jsx
+cd my-app
+sudo rm -f src/*
+```
+
+- [CSS 코드](https://codepen.io/gaearon/pen/oWWQNa?editors=0100)를 src/ 폴더에 index.css 파일로 추가해주세요.
+- [JS 코드](https://codepen.io/gaearon/pen/oWWQNa?editors=0010)를 src/ 폴더에 index.js 파일로 추가해주세요.
+- src/ 폴더에 있는 index.js 의 최상단에 아래 세 줄을 추가해주세요.
+
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+```
+
+```jsx
+🤚혹시 추가시 권한이 없어서 파일 생성이 안되면
+sudo chmod 777 /home/myplanet/my-app/*
+을 해주세요!
+```
+
+- 자! 이제 npm start 명령어를 실행하고 [localhost:3000](http://localhost:3000) 을 확인해보세요!
+
+
+## 📣 React 주요 개념
+
+가장 단순하 React 예시는 다음과 같이 생겼습니다.
+
+```jsx
+ReactDOM.render(
+	<h1>Hello, world!</h1>
+	document.getElementById('root')
+);
+```
+
+아래 변수 선언을 살펴봅시다.
+
+```jsx
+const element = <h1>Hello, world!</h1>
+```
+
+위에 태그 문법은 문자열도, HTML도 아닙니다.
+
+JSX라고 하며 JavaScript를 확장한 문법입니다. JSX는 React "엘리먼트(element)"를 생성합니다.
+
+### 📣JSX 란?
+
+React에서는 이벤트가 처리되는 방식, 시간에 따라 state 가 변하는 방식, 화면에 표기하기 위해 데이터가 준비되는 방식 등 렌더링 로직이 본질적으로 다른 UI 로직과 연결된다는 사실을 받아드립니다.
+
+React는 별도의 파일에 마크업과 로직을 넣어 기술을 인위적으로 분리하는 대신, 둘 다 포함하는 "컴포넌트"라고 부르는 느슨하게 연결된 유닛으로 관심사를 분리합니다. 이후 섹션에서 다시 컴포넌트로 돌아오겠지만, JS에 마크업을 넣는 게 익숙해지지 않는다면 이 이야기가 확신을 줄 것입니다.
+
+React는 JSX 사용이 필수가 아니지만, 대부분의 사람은 js코드 안에서 UI관련 작업을 할 때 시각적으로 더 도움이 된다고 생각합니다. 또한 React가 더욱 도움이 되는 에러 및 경고 메시지를 표시할 수 있게 해줍니다.
+
+## 📣 vscode - index.js
+
+index.js 파일에 코드를 추가합니다.
+
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+
+class Square extends React.Component {
+    state = {
+      num : 0
+    };
+
+    change = () => {
+      this.setState({
+        num: this.state.num + 1,
+      });
+      //document.getElementById('a').textContent = 'aaaa';
+    };
+    
+    render() {
+        const status  = 'react! 버튼 클릭횟수';
+        
+      return (
+        <div>
+            <div><span>{status}</span></div>
+            <div>
+              {this.state.num}
+              <button onClick={this.change}>Click Me!</button>
+            </div>
+        </div>
+      );
+    }
+  }
+
+  
+  // ========================================
+  
+  ReactDOM.render(
+    // <Game />,
+    // <Board />,
+    <Square />,
+    document.getElementById('root')
+  );
+```
+
+이렇게 코드를 넣은뒤에 terminal 에서
+
+```jsx
+sudo npm start
+```
+
+명령을 하고 Compiled successfully! 라고 뜨면 [localhost:3000](http://localhost:3000) 을 확인해주세요
+
+그럼 버튼을 누를때 숫자가 (+) 되는 것을 확인 할수 있습니다.;
+
+이제 docker-compose.yml 파일과 dockerfile 를 통해 도커 환경을 구성합니다.
+
+docker-compose.yml 파일을 생성합니다
+
+```jsx
+version: '3.7'
+
+services:
+
+  countview_app:
+    container_name: countview_app
+    build:
+      context: .
+      dockerfile: dockerfile
+    volumes:
+      - '.:/app'
+      - '/app/node_modules'
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+```
+
+위와 같이 코드를 넣어주세요. 마지막에 CHOKIDAR_USEPOLLING=true은 APP이 수정되었을 경우에 reload가 가능하도록 하는 설정입니다.
+
+
+2021.02.16 에 index.js 에 넣었던 내용중 class 형식이 아닌 함수 형식으로 바꿔보기~!
+
+```jsx
+import React,{ useState } from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+
+function Square(){
+
+  const [number, setNumber] = useState(0);
+
+  return(
+    <div>
+      <div>
+        <h2>v: {number}</h2>
+        <button onClick={() => {
+          setNumber((v) => v + 1);
+        }}>버튼</button>
+      </div>
+    </div>
+  );
+}
+
+  
+  ReactDOM.render(
+    <Square />,
+    document.getElementById('root')
+  );
+```
