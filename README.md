@@ -1535,7 +1535,7 @@ SPA 란 Single Page Application의 약자이다.
 
 ![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6f55d2d4-8002-405c-b093-969cf7cca167/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6f55d2d4-8002-405c-b093-969cf7cca167/Untitled.png)
 
-## 📣SPA 장점과 단점
+## 📣SPA 장점과 단점  
 
 - 장점
     1. 손쉬운 운영 배포
