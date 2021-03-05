@@ -1742,7 +1742,7 @@ services:
 위와 같이 코드를 넣어주세요. 마지막에 CHOKIDAR_USEPOLLING=true은 APP이 수정되었을 경우에 reload가 가능하도록 하는 설정입니다.
 
 
-2021.02.16 에 index.js 에 넣었던 내용중 class 형식이 아닌 함수 형식으로 바꿔보기~!
+
 
 ```jsx
 import React,{ useState } from 'react';
@@ -1771,3 +1771,14 @@ function Square(){
     document.getElementById('root')
   );
 ```
+
+### 📣 ajax 란 무엇인가?
+
+⇒ ajax 는 javascript 의 라이브러리 중 하나이고 Asynchronous Javascript And Xml(비동기식 자바스크       립트와 xml)의 약자입니다. 브라우저가 가지고 있는 XMLHttpRequest 객체를 이용해서 전체 페이지를 새로 고치지 않고도 페이지의 일부만을 위한 데이터를 로드하는 기법이며, Ajax를 한마디로 정의하면 jsvascript를 사용한 비동기 통신, 클라이언트와 서버간에 XML 데이터를 주고받는 기술이라고 할 수 있습니다.
+
+### 📣 Ajax 의 장점
+
+1. 웹페이지의 속도 향상
+2. 서버의 처리가 완료 될때까지 기다리지 않고 처리 가능하다.
+3. 서버에서 Data만 전송하면 되므로 전체적은 코드양이 줄어든다.
+4. 기존 웹에서는 불가능했던 다양한 UI를 가능하게 해준다.
