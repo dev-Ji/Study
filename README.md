@@ -279,7 +279,7 @@ $ pwd
 /home/root
 ```
 
-### cd ( change directory)
+### cd ( change directory) 
 
 경로 이동
 
